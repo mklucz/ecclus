@@ -1,0 +1,29 @@
+{
+	
+	"manifest_version": 2,
+	"name": "Ecclus",
+	"version":  "0.0.1",
+	
+	"description": "Detects Bible Book Name Abbreviations",
+	
+	"web_accessible_resources": [
+	  "lang/*/*.js",
+	  "background-script.js"
+	],
+	
+	"permissions": [
+	  "http://*.deon.pl/"],
+
+	"background": {
+  	  "page": "background-page.html",
+  	  
+      "persistent": false
+	},
+	
+	"content_scripts": [
+	{
+	  "matches": ["*://*.mateusz.pl/*", "*://*.brewiarz.pl/*", "file:///*"],
+	  "js": ["jquery-3.1.1.min.js", "detect.js", "lang/pl/general.js"]
+	}
+	]
+}
