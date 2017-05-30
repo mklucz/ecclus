@@ -15,8 +15,9 @@ pl = {
     var dictToReturn = new Map();
     for (var i = 0; i < candidates.length; i++) {
 		var candidate = candidates[i];
+		var fullCandidate = candidate;
 		var book = null;
-		//console.log(candidate); //
+		
 		try {
 			var possibleBooks = candidate.match(/([0-9]? ?[A-ZŁa-zł]+)|;/g); //https://regex101.com/r/kS53nP/1
 			//console.log(possibleBooks);
@@ -25,23 +26,21 @@ pl = {
 					//console.log(book, previousBook); //
 					book = possibleBooks[j];
 					//console.log(book); //
+					if (book == ";") {
+						book = previousBook;
+					}
+					else {
+						previousBook = book;
+					}
 				}
 			}
 		}
 		catch(err) {console.log("book error");}
-		//console.log("\n"); //
-		//extract the book name's abbreviation
-		if (book == ";") { //shouldn't it check if (book) separately from if (book.includes)?
-			book = previousBook;
-		}
-		else {
-			previousBook = book;
-		}
-
+		
 		try {
-			var chapter = candidate.match(/[0-9]*,/g)[0].slice(0, -1);
+			var chapterStart = candidate.match(/[0-9]*,/g)[0].slice(0, -1); //https://regex101.com/r/Lrfl0A/1
 		}
-		catch(err) {console.log("chapter error");}
+		catch(err) {console.log("chapterStart error");}
 		//as above, and the slice is here to cut off the trailing coma
 		
 		try {
@@ -72,20 +71,21 @@ pl = {
 		//bundled with the languages
 		
 		//~ if (books.prototype.has(book)) {
-			//~ //there will also be tests for is the chapter in range and
+			//~ //there will also be tests for is the chapterStart in range and
 			//~ //is the verse in range, I'll add them once I redo the 
 			//~ //"books" mapping to contain js objects instead of strings
 		    //~ var indexOfAbb = text.indexOf(candidate);
 			//~ 
 		//~
-		dictToReturn.set(candidate, {book: book, 
-			                         chapter: chapter,
+		dictToReturn.set(fullCandidate, {book: book, 
+			                         chapterStart: chapterStart,
 			                         verseStart: verseStart,
 			                         verseEnd: verseEnd,
 			                         tbc: tbc});
 		
 	}
-    console.log(dictToReturn);
+    //console.log(dictToReturn);
+    //console.log($('meta[name~="charset"]'));
     return dictToReturn;
 	},
 	
@@ -129,39 +129,45 @@ pl = {
 		deon : {
 
 			makeLink : 
-			function(key, abbObj) {
-			let book = abbObj.book;
+			function(key, abbObjGNRL) {
+			let book = abbObjGNRL.book;
 				if (book) {book = book.replace(" ", "%20");};
-			let chapter = abbObj.chapter;
-			let verseStart = abbObj.verseStart;
-			let verseEnd = abbObj.verseEnd;
-			let tbc = abbObj.tbc;
-			let link = "<a href=http://biblia.deon.pl/otworz.php?skrot=" + book + "%20" + chapter + "#W" + verseStart + ">" + key + "</a>"
+			let chapterStart = abbObjGNRL.chapterStart;
+			let verseStart = abbObjGNRL.verseStart;
+			let verseEnd = abbObjGNRL.verseEnd;
+			let tbc = abbObjGNRL.tbc;
+			let link = "<a href=http://biblia.deon.pl/otworz.php?skrot=" + book + "%20" + chapterStart + "#W" + verseStart + ">" + key + "</a>"
 			return link;
 			},
 
 			fetchVerse :
-			function(key, abbObj) {
-			let link = makeLink(key, abbObj);
+			function(key, abbObjGNRL) {
+			let link = makeLink(key, abbObjGNRL);
 			console.log(chrome.extension.getURL('background-page.html'))
-			chrome.runtime.sendMessage({link: link}, function(response) {
- 				console.log(response);
+			let msg = {link: link, charset: getCharset(), abbObjGNRL:abbObjGNRL};
+			chrome.runtime.sendMessage(JSON.stringify(msg), function(response) {
+ 				
+ 				console.log(decodeURIComponent(response));
 			});
+			// chrome.runtime.sendMessage(JSON.stringify(msg), function(response) {
+ 		// 		waitForResponse(response, console.log);
+ 				
+			// });
 
 			// $.ajaxSetup({dataType : 'xml',
 			// 			 charset  : 'iso-8859-2',
 			// 			 converters : {'text xml' : myParser}});	
 			
-			// let book = abbObj.book;
+			// let book = abbObjGNRL.book;
 			// 	if (book) {book = book.replace(" ", "%20");};
-			// let chapter = abbObj.chapter;
-			// let verseStart = abbObj.verseStart;
-			// let verseEnd = abbObj.verseEnd;
-			// let tbc = abbObj.tbc;
-			// //+ "%20" + chapter + "#W" + verseStart
+			// let chapterStart = abbObjGNRL.chapterStart;
+			// let verseStart = abbObjGNRL.verseStart;
+			// let verseEnd = abbObjGNRL.verseEnd;
+			// let tbc = abbObjGNRL.tbc;
+			// //+ "%20" + chapterStart + "#W" + verseStart
 			// let versesMap = new Map();
 			// let verses = null;
-			// let siteHTML = $.get("http://biblia.deon.pl/otworz.php?skrot=" + book + "%20" + chapter, function() {
+			// let siteHTML = $.get("http://biblia.deon.pl/otworz.php?skrot=" + book + "%20" + chapterStart, function() {
 			// 	//console.log("bum", siteHTML.responseText);
 			// 	//siteHTML = siteHTML.responseText;
 			// 	//(/13&nbsp;\<\/span\>.*\<a name="W14/g)
@@ -191,6 +197,3 @@ pl = {
 	}
 
 };
-function myParser(x) {
-	return x;
-}

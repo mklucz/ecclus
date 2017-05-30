@@ -11,13 +11,17 @@
 	  "background-script.js"
 	],
 	
+	"icons": {
+  	  "96": "96.png"
+    },
+
 	"permissions": [
 	  "http://*.deon.pl/"],
 
 	"background": {
   	  "page": "background-page.html",
   	  
-      "persistent": false
+	  "persistent": false
 	},
 	
 	"content_scripts": [

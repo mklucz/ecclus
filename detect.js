@@ -57,6 +57,20 @@ function replaceAll(str, find, replace) {
   return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 }
 
+function getCharset() {
+	//console.log($( 'meta[name="charset"]' ).prevObject[0]);
+	return $( 'meta[name="charset"]' );
+}
+
+// function waitForResponse(response, someFunction){
+//     if (typeof response !== "undefined") {
+//         someFunction(response);
+//     }
+//     else{
+//         setTimeout(waitForResponse, 250);
+//     }
+// }
+
 $(document).ready(function() {
 	var lang = eval(getLanguage());
 	var translation = eval(getTranslation());

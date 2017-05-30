@@ -4,6 +4,54 @@
 		"selected_items":
 		[
 			[
+				"grab",
+				"grabVerseTwo"
+			],
+			[
+				"abb",
+				"abbObj"
+			],
+			[
+				"da",
+				"dataOutside"
+			],
+			[
+				"send",
+				"sendResponse"
+			],
+			[
+				"some",
+				"someFunction"
+			],
+			[
+				"parse",
+				"parsedResponse"
+			],
+			[
+				"the",
+				"theHTML"
+			],
+			[
+				"verse",
+				"verseStart"
+			],
+			[
+				"dic",
+				"dictToReturn"
+			],
+			[
+				"add",
+				"addQuotations"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"make",
+				"makeLink"
+			],
+			[
 				"dru",
 				"drugiTesting"
 			],
@@ -23,7 +71,16 @@
 			"file": "manifest.json",
 			"settings":
 			{
-				"buffer_size": 492,
+				"buffer_size": 559,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "background-script.js",
+			"settings":
+			{
+				"buffer_size": 2410,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -32,16 +89,7 @@
 			"file": "detect.js",
 			"settings":
 			{
-				"buffer_size": 3516,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "background.js",
-			"settings":
-			{
-				"buffer_size": 0,
+				"buffer_size": 2479,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -50,19 +98,40 @@
 			"file": "lang/pl/general.js",
 			"settings":
 			{
-				"buffer_size": 5302,
+				"buffer_size": 7084,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "test.js",
+			"contents": "pl = {\n\tsearchForAbbreviations : \n\tfunction(text) {\n    \n    var candidates =\n    text.match(/(|[0-9] )([A-ZŁ][a-zł]*|;|; ) ([0-9]{1,3}),* *(([0-9]{1,2})(a|b|n|))(((|(-?|\\.?|))[0-9]{1,2})(a|b|n|)| n|)/g);\n    //https://regex101.com/r/jD7ldF/2\n\n    //(Iz 61, 10 - 62, 5) \n    //Pwt 7, 6b. 8-9 \n    //por. 13, 11\n\n    if (candidates == null) {return null};\n    var previousBook = null; //handles the semicolon in >>1 Kor 12, 3-5; 13, 1-2<< \n    var dictToReturn = new Map();\n    for (var i = 0; i < candidates.length; i++) {\n\t\tvar candidate = candidates[i];\n\t\tvar fullCandidate = candidate;\n\t\tvar book = null;\n\t\t\n\t\ttry {\n\t\t\tvar possibleBooks = candidate.match(/([0-9]? ?[A-ZŁa-zł]+)|;/g); //https://regex101.com/r/kS53nP/1\n\t\t\t//console.log(possibleBooks);\n\t\t\tfor (var j = 0; j < possibleBooks.length; j++) {\n\t\t\t\tif (booksMap.has(possibleBooks[j])) {\n\t\t\t\t\t//console.log(book, previousBook); //\n\t\t\t\t\tbook = possibleBooks[j];\n\t\t\t\t\t//console.log(book); //\n\t\t\t\t\tif (book == \";\") {\n\t\t\t\t\t\tbook = previousBook;\n\t\t\t\t\t}\n\t\t\t\t\telse {\n\t\t\t\t\t\tpreviousBook = book;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tcatch(err) {console.log(\"book error\");}\n\t\t\n\t\ttry {\n\t\t\tvar chapterStart = candidate.match(/[0-9]*,/g)[0].slice(0, -1); //https://regex101.com/r/Lrfl0A/1\n\t\t}\n\t\tcatch(err) {console.log(\"chapterStart error\");}\n\t\t//as above, and the slice is here to cut off the trailing coma\n\t\t\n\t\ttry {\n\t\t\tvar verseStart = candidate.match(/, [0-9]*/g)[0].slice(2);\n\t\t}\n\t\tcatch(err) {console.log(\"verseStart error\");}\n\t\t//get the starting verse number\n\t\t\n\t\ttry {\n\t\t\tvar verseEnd = candidate.slice(\n\t\t\tcandidate.indexOf(verseStart) + verseStart.length);\n\t\t\tif (verseEnd.slice(-1) == \"n\") {\n\t\t\t\tvar tbc = true;\n\t\t\t\tverseEnd = verseEnd.match(/[0-9]*/g)[0];\n\t\t\t\t//tbc stands for \"to be continued\"\n\t\t\t}\n\t\t\telse {\n\t\t\t\tvar tbc = false;\n\t\t\t\tverseEnd = verseEnd.slice(1);\n\t\t\t}\n\t\t}\n\t\tcatch(err) {console.log(\"verseEnd error\");}\n\t\t//this one's a bit different than the three above, as it needs\n\t\t//to handle the \"n\", meaning \"and however many verses are below,\n\t\t//all the way to the next paragraph\"\n\t\t//at least in polish it's \"n\", as for other languages, we'll see\n\t\t//in time, as I said already, all of this logic is supposed to be \n\t\t//bundled with the languages\n\t\t\n\t\t//~ if (books.prototype.has(book)) {\n\t\t\t//~ //there will also be tests for is the chapterStart in range and\n\t\t\t//~ //is the verse in range, I'll add them once I redo the \n\t\t\t//~ //\"books\" mapping to contain js objects instead of strings\n\t\t    //~ var indexOfAbb = text.indexOf(candidate);\n\t\t\t//~ \n\t\t//~\n\t\tdictToReturn.set(fullCandidate, {book: book, \n\t\t\t                         chapterStart: chapterStart,\n\t\t\t                         verseStart: verseStart,\n\t\t\t                         verseEnd: verseEnd,\n\t\t\t                         tbc: tbc});\n\t\t\n\t}\n    //console.log(dictToReturn);\n    //console.log($('meta[name~=\"charset\"]'));\n    return dictToReturn;\n\t},\n\t\n\t// addQuotations :\n\t// function(node, abbs) {\n //    for (let key of abbs.keys()) {\n\t// \tif (node.innerHTML) { //add a test to see if it's not a script or something else that we shouldn't mess up\n\t// \t\tnode.innerHTML = replaceAll(node.innerHTML, key, translations.deon.makeLink(key, abbs.get(key)));\n\t// \t\t//node.innerHTML = node.innerHTML.replace(key, makeLink(key, abbs.get(key)));\n\t// \t\t//console.log(fetchVerse(key, abbs.get(key)));\n\t// \t\ttranslations.deon.fetchVerse(key, abbs.get(key));\n\t// \t}\n\t// }\n //    return null\n\t// },\n\n\tbooksMap : new Map(\n\t\t[['Rdz', 'Rdz'], ['Wj', 'Wj'], ['Lb', 'Lb'], ['Pwt', 'Pwt'],\n\t\t['Joz', 'Joz'], ['Sdz', 'Sdz'], ['Rt', 'Rt'], ['1 Sm', '1 Sm'],\n\t\t['2 Sm', '2 Sm'], ['1 Krl', '1 Krl'], ['2 Krl', '2 Krl'],\n\t\t['1 Krn', '1 Krn'], ['2 Krn', '2 Krn'], ['Ezd', 'Ezd'],\n\t\t['Ne', 'Ne'], ['Tb', 'Tb'], ['Jdt', 'Jdt'], ['Est', 'Est'],\n\t\t['1 Mch', '1 Mch'], ['2 Mch', '2 Mch'], ['Hi', 'Hi'], ['Ps', 'Ps'],\n\t\t['Prz', 'Prz'], ['Koh', 'Koh'], ['Pnp', 'Pnp'], ['Mdr', 'Mdr'],\n\t\t['Syr', 'Syr'], ['Iz', 'Iz'], ['Jr', 'Jr'], ['Lm', 'Lm'],\n\t\t['Ba', 'Ba'], ['Ez', 'Ez'], ['Dn', 'Dn'], ['Oz', 'Oz'],\n\t\t['Jl', 'Jl'], ['Am', 'Am'], ['Ab', 'Ab'], ['Jon', 'Jon'],\n\t\t['Mi', 'Mi'], ['Na', 'Na'], ['Ha', 'Ha'], ['So', 'So'],\n\t\t['Ag', 'Ag'], ['Za', 'Za'], ['Ml', 'Ml'], ['Mt', 'Mt'],\n\t\t['Mk', 'Mk'], ['J', 'J'], ['Dz', 'Dz'], ['Rz', 'Rz'],\n\t\t['1 Kor', '1 Kor'], ['2 Kor', '2 Kor'], ['Ga', 'Ga'],\n\t\t['Ef', 'Ef'], ['Flp', 'Flp'], ['Kol', 'Kol'],\n\t\t['1 Tes', '1 Tes'], ['2 Tes', '2 Tes'], ['1 Tm', '1 Tm'],\n\t\t['2 Tm', '2 Tm'], ['Tt', 'Tt'], ['Flm', 'Flm'],\n\t\t['Hbr', 'Hbr'], ['Jk', 'Jk'], ['1 P', '1 P'],\n\t\t['2 P', '2 P'], ['1 J', '1 J'], ['Ap', 'Ap'],\n\t\t['2 J', '2 J'], ['3 J', '3 J'], ['Jud', 'Jud'], [';', ';']]\n\t),\n\n\ttranslations : {\n\t\tdeon : {\n\n\t\t\tmakeLink : \n\t\t\tfunction(key, abbObjGNRL) {\n\t\t\tlet book = abbObjGNRL.book;\n\t\t\t\tif (book) {book = book.replace(\" \", \"%20\");};\n\t\t\tlet chapterStart = abbObjGNRL.chapterStart;\n\t\t\tlet verseStart = abbObjGNRL.verseStart;\n\t\t\tlet verseEnd = abbObjGNRL.verseEnd;\n\t\t\tlet tbc = abbObjGNRL.tbc;\n\t\t\tlet link = \"<a href=http://biblia.deon.pl/otworz.php?skrot=\" + book + \"%20\" + chapterStart + \"#W\" + verseStart + \">\" + key + \"</a>\"\n\t\t\treturn link;\n\t\t\t},\n\n\t\t\tfetchVerse :\n\t\t\tfunction(key, abbObjGNRL) {\n\t\t\tlet link = makeLink(key, abbObjGNRL);\n\t\t\tconsole.log(chrome.extension.getURL('background-page.html'))\n\t\t\tlet msg = {link: link, charset: getCharset(), abbObjGNRL:abbObjGNRL};\n\t\t\tchrome.runtime.sendMessage(JSON.stringify(msg), function(response) {\n \t\t\t\t\n \t\t\t\tconsole.log(response, \"hmm\");\n\t\t\t});\n\t\t\t// chrome.runtime.sendMessage(JSON.stringify(msg), function(response) {\n \t\t// \t\twaitForResponse(response, console.log);\n \t\t\t\t\n\t\t\t// });\n\n\t\t\t// $.ajaxSetup({dataType : 'xml',\n\t\t\t// \t\t\t charset  : 'iso-8859-2',\n\t\t\t// \t\t\t converters : {'text xml' : myParser}});\t\n\t\t\t\n\t\t\t// let book = abbObjGNRL.book;\n\t\t\t// \tif (book) {book = book.replace(\" \", \"%20\");};\n\t\t\t// let chapterStart = abbObjGNRL.chapterStart;\n\t\t\t// let verseStart = abbObjGNRL.verseStart;\n\t\t\t// let verseEnd = abbObjGNRL.verseEnd;\n\t\t\t// let tbc = abbObjGNRL.tbc;\n\t\t\t// //+ \"%20\" + chapterStart + \"#W\" + verseStart\n\t\t\t// let versesMap = new Map();\n\t\t\t// let verses = null;\n\t\t\t// let siteHTML = $.get(\"http://biblia.deon.pl/otworz.php?skrot=\" + book + \"%20\" + chapterStart, function() {\n\t\t\t// \t//console.log(\"bum\", siteHTML.responseText);\n\t\t\t// \t//siteHTML = siteHTML.responseText;\n\t\t\t// \t//(/13&nbsp;\\<\\/span\\>.*\\<a name=\"W14/g)\n\t\t\t// \tlet toMatch = new RegExp(verseStart + '&nbsp;\\\\<\\\\/span\\\\>.*\\\\<a name=\"W' + verseEnd, 'g');\n\t\t\t// \tlet verses = siteHTML.responseText.match(toMatch);\n\t\t\t// \tconsole.log(verses);\n\t\t\t// console.log(siteHTML);\n\t\t\t// });\n\t\t\t// //let regexp = null;\n\t\t\t// return null\n\t\t\t},\n\n\t\t\taddQuotations :\n\t\t\tfunction(node, abbs) {\n\t\t    for (let key of abbs.keys()) {\n\t\t\t\tif (node.innerHTML) { //add a test to see if it's not a script or something else that we shouldn't mess up\n\t\t\t\t\tnode.innerHTML = replaceAll(node.innerHTML, key, makeLink(key, abbs.get(key)));\n\t\t\t\t\t//node.innerHTML = node.innerHTML.replace(key, makeLink(key, abbs.get(key)));\n\t\t\t\t\t//console.log(fetchVerse(key, abbs.get(key)));\n\t\t\t\t\tfetchVerse(key, abbs.get(key));\n\t\t\t\t}\n\t\t\t}\n\t\t    return null;\n\t\t\t}\n\t\t}\n\t\t\t\n\t}\n\n};\n",
+			"file": "lang/pl/general2.js",
+			"file_size": 7088,
+			"file_write_time": 131402188526931681,
 			"settings":
 			{
-				"buffer_size": 67,
+				"buffer_size": 7084,
 				"encoding": "UTF-8",
 				"line_ending": "Unix",
-				"name": "test.js"
+				"name": "pl = {"
+			}
+		},
+		{
+			"file": "background-page.html",
+			"settings":
+			{
+				"buffer_size": 233,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "other/short/short.htm",
+			"settings":
+			{
+				"buffer_size": 2508,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -109,13 +178,26 @@
 	],
 	"file_history":
 	[
+		"/home/maciek/Desktop/faryzeusze",
+		"/home/maciek/not",
+		"/home/maciek/Documents/newprog/ecclus/other/example/example.htm",
+		"/home/maciek/Documents/newprog/ecclus/background-script.js",
+		"/home/maciek/.config/hexchat/scrollback/freenode/##javascript.txt",
+		"/home/maciek/Documents/newprog/ecclus/eventPage.js",
+		"/home/maciek/Documents/newprog/ecclus/ecclus.sublime-project",
+		"/home/maciek/Documents/newprog/ecclus/other/biblia.js",
+		"/home/maciek/Documents/newprog/ecclus/other/what.html",
+		"/home/maciek/Documents/newprog/sobory i regexpy",
+		"/home/maciek/Documents/newprog/ecclus/other/example/Teologiczne aspekty aktu przyjęcia Jezusa Chrystusa za Króla i Pana.htm",
+		"/home/maciek/Documents/newprog/ecclus/other/short/Teologiczne aspekty aktu przyjęcia Jezusa Chrystusa za Króla i Pana.htm",
+		"/home/maciek/Documents/newprog/ecclus/test.js",
 		"/home/maciek/Documents/newprog/ecclus/background.js",
 		"/home/maciek/Documents/newprog/dota tooltips/add_tooltips.js",
 		"/home/maciek/Documents/newprog/ecclus/example/Teologiczne aspekty aktu przyjęcia Jezusa Chrystusa za Króla i Pana.htm"
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -129,6 +211,12 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"abbObjGNRL",
+			"makeLink",
+			"abbObj",
+			"chapter",
+			"contentType = 'application/x-www-form-urlencoded; charset=iso-8859-2',\n\t\t\t\t\t\t",
+			"addQ",
 			"importLang",
 			"});",
 			"\n\t\t//~ if (books.prototype.has(book)) {\n\t\t\t//~ //there will also be tests for is the chapter in range and\n\t\t\t//~ //is the verse in range, I'll add them once I redo the \n\t\t\t//~ //\"books\" mapping to contain js objects instead of strings\n\t\t    //~ var indexOfAbb = text.indexOf(candidate);\n\t\t\t//~ \n\t\t//~"
@@ -139,6 +227,10 @@
 		"regex": false,
 		"replace_history":
 		[
+			"abbObj",
+			"getLink",
+			"abbObjGNRL",
+			"abbObjBS"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -158,15 +250,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 492,
+						"buffer_size": 559,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								412,
-								412
+								237,
+								237
 							]
 						],
 						"settings":
@@ -177,32 +269,33 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "detect.js",
+					"file": "background-script.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3516,
+						"buffer_size": 2410,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2072,
-								2072
+								985,
+								985
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1020.0,
+						"translation.y": 102.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
@@ -210,19 +303,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "background.js",
+					"file": "detect.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 2479,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1824,
+								1824
 							]
 						],
 						"settings":
@@ -242,23 +335,27 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5302,
+						"buffer_size": 7084,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5267,
-								5267
+								6024,
+								6024
 							]
 						],
 						"settings":
 						{
+							"rulers":
+							[
+								120
+							],
 							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 2040.0,
+						"translation.y": 2142.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -266,31 +363,88 @@
 				},
 				{
 					"buffer": 4,
-					"file": "test.js",
+					"file": "lang/pl/general2.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 67,
+						"buffer_size": 7084,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								40,
-								40
+								7084,
+								7084
 							]
 						],
 						"settings":
 						{
-							"auto_name": "test.js",
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+							"auto_name": "pl = {",
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "background-page.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 233,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								233,
+								233
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "other/short/short.htm",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2508,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1886,
+								1886
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 204.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -335,7 +489,7 @@
 	"project": "ecclus.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 64.0
 	},
 	"save_all_on_build": true,
 	"select_file":
