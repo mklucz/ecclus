@@ -4,12 +4,104 @@
 		"selected_items":
 		[
 			[
-				"grab",
-				"grabVerseTwo"
-			],
-			[
 				"abb",
 				"abbObj"
+			],
+			[
+				"fetche",
+				"fetchedData"
+			],
+			[
+				"fetc",
+				"fetchedPages"
+			],
+			[
+				"urls",
+				"urlsToGet"
+			],
+			[
+				"chapters",
+				"chaptersToGet"
+			],
+			[
+				"in",
+				"individualNumbers"
+			],
+			[
+				"cu",
+				"currentChapter"
+			],
+			[
+				"curr",
+				"currChapInd"
+			],
+			[
+				"curre",
+				"currentChapterIndex"
+			],
+			[
+				"or",
+				"orderedNums"
+			],
+			[
+				"split",
+				"splitNums"
+			],
+			[
+				"spli",
+				"splitNums"
+			],
+			[
+				"spl",
+				"splitNums"
+			],
+			[
+				"align",
+				"align-self"
+			],
+			[
+				"get",
+				"getTranslation"
+			],
+			[
+				"end",
+				"endOfText"
+			],
+			[
+				"con",
+				"continue"
+			],
+			[
+				"ver",
+				"verseStart"
+			],
+			[
+				"en",
+				"endMatch"
+			],
+			[
+				"verse",
+				"verseEnd"
+			],
+			[
+				"star",
+				"startMatchString"
+			],
+			[
+				"ex",
+				"extractVerse"
+			],
+			[
+				"par",
+				"parsedRequest"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"grab",
+				"grabVerseTwo"
 			],
 			[
 				"da",
@@ -30,10 +122,6 @@
 			[
 				"the",
 				"theHTML"
-			],
-			[
-				"verse",
-				"verseStart"
 			],
 			[
 				"dic",
@@ -71,7 +159,7 @@
 			"file": "manifest.json",
 			"settings":
 			{
-				"buffer_size": 559,
+				"buffer_size": 1080,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -80,7 +168,7 @@
 			"file": "background-script.js",
 			"settings":
 			{
-				"buffer_size": 2410,
+				"buffer_size": 1582,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -89,7 +177,7 @@
 			"file": "detect.js",
 			"settings":
 			{
-				"buffer_size": 2479,
+				"buffer_size": 1940,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -98,40 +186,66 @@
 			"file": "lang/pl/general.js",
 			"settings":
 			{
-				"buffer_size": 7084,
+				"buffer_size": 12261,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "pl = {\n\tsearchForAbbreviations : \n\tfunction(text) {\n    \n    var candidates =\n    text.match(/(|[0-9] )([A-ZŁ][a-zł]*|;|; ) ([0-9]{1,3}),* *(([0-9]{1,2})(a|b|n|))(((|(-?|\\.?|))[0-9]{1,2})(a|b|n|)| n|)/g);\n    //https://regex101.com/r/jD7ldF/2\n\n    //(Iz 61, 10 - 62, 5) \n    //Pwt 7, 6b. 8-9 \n    //por. 13, 11\n\n    if (candidates == null) {return null};\n    var previousBook = null; //handles the semicolon in >>1 Kor 12, 3-5; 13, 1-2<< \n    var dictToReturn = new Map();\n    for (var i = 0; i < candidates.length; i++) {\n\t\tvar candidate = candidates[i];\n\t\tvar fullCandidate = candidate;\n\t\tvar book = null;\n\t\t\n\t\ttry {\n\t\t\tvar possibleBooks = candidate.match(/([0-9]? ?[A-ZŁa-zł]+)|;/g); //https://regex101.com/r/kS53nP/1\n\t\t\t//console.log(possibleBooks);\n\t\t\tfor (var j = 0; j < possibleBooks.length; j++) {\n\t\t\t\tif (booksMap.has(possibleBooks[j])) {\n\t\t\t\t\t//console.log(book, previousBook); //\n\t\t\t\t\tbook = possibleBooks[j];\n\t\t\t\t\t//console.log(book); //\n\t\t\t\t\tif (book == \";\") {\n\t\t\t\t\t\tbook = previousBook;\n\t\t\t\t\t}\n\t\t\t\t\telse {\n\t\t\t\t\t\tpreviousBook = book;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tcatch(err) {console.log(\"book error\");}\n\t\t\n\t\ttry {\n\t\t\tvar chapterStart = candidate.match(/[0-9]*,/g)[0].slice(0, -1); //https://regex101.com/r/Lrfl0A/1\n\t\t}\n\t\tcatch(err) {console.log(\"chapterStart error\");}\n\t\t//as above, and the slice is here to cut off the trailing coma\n\t\t\n\t\ttry {\n\t\t\tvar verseStart = candidate.match(/, [0-9]*/g)[0].slice(2);\n\t\t}\n\t\tcatch(err) {console.log(\"verseStart error\");}\n\t\t//get the starting verse number\n\t\t\n\t\ttry {\n\t\t\tvar verseEnd = candidate.slice(\n\t\t\tcandidate.indexOf(verseStart) + verseStart.length);\n\t\t\tif (verseEnd.slice(-1) == \"n\") {\n\t\t\t\tvar tbc = true;\n\t\t\t\tverseEnd = verseEnd.match(/[0-9]*/g)[0];\n\t\t\t\t//tbc stands for \"to be continued\"\n\t\t\t}\n\t\t\telse {\n\t\t\t\tvar tbc = false;\n\t\t\t\tverseEnd = verseEnd.slice(1);\n\t\t\t}\n\t\t}\n\t\tcatch(err) {console.log(\"verseEnd error\");}\n\t\t//this one's a bit different than the three above, as it needs\n\t\t//to handle the \"n\", meaning \"and however many verses are below,\n\t\t//all the way to the next paragraph\"\n\t\t//at least in polish it's \"n\", as for other languages, we'll see\n\t\t//in time, as I said already, all of this logic is supposed to be \n\t\t//bundled with the languages\n\t\t\n\t\t//~ if (books.prototype.has(book)) {\n\t\t\t//~ //there will also be tests for is the chapterStart in range and\n\t\t\t//~ //is the verse in range, I'll add them once I redo the \n\t\t\t//~ //\"books\" mapping to contain js objects instead of strings\n\t\t    //~ var indexOfAbb = text.indexOf(candidate);\n\t\t\t//~ \n\t\t//~\n\t\tdictToReturn.set(fullCandidate, {book: book, \n\t\t\t                         chapterStart: chapterStart,\n\t\t\t                         verseStart: verseStart,\n\t\t\t                         verseEnd: verseEnd,\n\t\t\t                         tbc: tbc});\n\t\t\n\t}\n    //console.log(dictToReturn);\n    //console.log($('meta[name~=\"charset\"]'));\n    return dictToReturn;\n\t},\n\t\n\t// addQuotations :\n\t// function(node, abbs) {\n //    for (let key of abbs.keys()) {\n\t// \tif (node.innerHTML) { //add a test to see if it's not a script or something else that we shouldn't mess up\n\t// \t\tnode.innerHTML = replaceAll(node.innerHTML, key, translations.deon.makeLink(key, abbs.get(key)));\n\t// \t\t//node.innerHTML = node.innerHTML.replace(key, makeLink(key, abbs.get(key)));\n\t// \t\t//console.log(fetchVerse(key, abbs.get(key)));\n\t// \t\ttranslations.deon.fetchVerse(key, abbs.get(key));\n\t// \t}\n\t// }\n //    return null\n\t// },\n\n\tbooksMap : new Map(\n\t\t[['Rdz', 'Rdz'], ['Wj', 'Wj'], ['Lb', 'Lb'], ['Pwt', 'Pwt'],\n\t\t['Joz', 'Joz'], ['Sdz', 'Sdz'], ['Rt', 'Rt'], ['1 Sm', '1 Sm'],\n\t\t['2 Sm', '2 Sm'], ['1 Krl', '1 Krl'], ['2 Krl', '2 Krl'],\n\t\t['1 Krn', '1 Krn'], ['2 Krn', '2 Krn'], ['Ezd', 'Ezd'],\n\t\t['Ne', 'Ne'], ['Tb', 'Tb'], ['Jdt', 'Jdt'], ['Est', 'Est'],\n\t\t['1 Mch', '1 Mch'], ['2 Mch', '2 Mch'], ['Hi', 'Hi'], ['Ps', 'Ps'],\n\t\t['Prz', 'Prz'], ['Koh', 'Koh'], ['Pnp', 'Pnp'], ['Mdr', 'Mdr'],\n\t\t['Syr', 'Syr'], ['Iz', 'Iz'], ['Jr', 'Jr'], ['Lm', 'Lm'],\n\t\t['Ba', 'Ba'], ['Ez', 'Ez'], ['Dn', 'Dn'], ['Oz', 'Oz'],\n\t\t['Jl', 'Jl'], ['Am', 'Am'], ['Ab', 'Ab'], ['Jon', 'Jon'],\n\t\t['Mi', 'Mi'], ['Na', 'Na'], ['Ha', 'Ha'], ['So', 'So'],\n\t\t['Ag', 'Ag'], ['Za', 'Za'], ['Ml', 'Ml'], ['Mt', 'Mt'],\n\t\t['Mk', 'Mk'], ['J', 'J'], ['Dz', 'Dz'], ['Rz', 'Rz'],\n\t\t['1 Kor', '1 Kor'], ['2 Kor', '2 Kor'], ['Ga', 'Ga'],\n\t\t['Ef', 'Ef'], ['Flp', 'Flp'], ['Kol', 'Kol'],\n\t\t['1 Tes', '1 Tes'], ['2 Tes', '2 Tes'], ['1 Tm', '1 Tm'],\n\t\t['2 Tm', '2 Tm'], ['Tt', 'Tt'], ['Flm', 'Flm'],\n\t\t['Hbr', 'Hbr'], ['Jk', 'Jk'], ['1 P', '1 P'],\n\t\t['2 P', '2 P'], ['1 J', '1 J'], ['Ap', 'Ap'],\n\t\t['2 J', '2 J'], ['3 J', '3 J'], ['Jud', 'Jud'], [';', ';']]\n\t),\n\n\ttranslations : {\n\t\tdeon : {\n\n\t\t\tmakeLink : \n\t\t\tfunction(key, abbObjGNRL) {\n\t\t\tlet book = abbObjGNRL.book;\n\t\t\t\tif (book) {book = book.replace(\" \", \"%20\");};\n\t\t\tlet chapterStart = abbObjGNRL.chapterStart;\n\t\t\tlet verseStart = abbObjGNRL.verseStart;\n\t\t\tlet verseEnd = abbObjGNRL.verseEnd;\n\t\t\tlet tbc = abbObjGNRL.tbc;\n\t\t\tlet link = \"<a href=http://biblia.deon.pl/otworz.php?skrot=\" + book + \"%20\" + chapterStart + \"#W\" + verseStart + \">\" + key + \"</a>\"\n\t\t\treturn link;\n\t\t\t},\n\n\t\t\tfetchVerse :\n\t\t\tfunction(key, abbObjGNRL) {\n\t\t\tlet link = makeLink(key, abbObjGNRL);\n\t\t\tconsole.log(chrome.extension.getURL('background-page.html'))\n\t\t\tlet msg = {link: link, charset: getCharset(), abbObjGNRL:abbObjGNRL};\n\t\t\tchrome.runtime.sendMessage(JSON.stringify(msg), function(response) {\n \t\t\t\t\n \t\t\t\tconsole.log(response, \"hmm\");\n\t\t\t});\n\t\t\t// chrome.runtime.sendMessage(JSON.stringify(msg), function(response) {\n \t\t// \t\twaitForResponse(response, console.log);\n \t\t\t\t\n\t\t\t// });\n\n\t\t\t// $.ajaxSetup({dataType : 'xml',\n\t\t\t// \t\t\t charset  : 'iso-8859-2',\n\t\t\t// \t\t\t converters : {'text xml' : myParser}});\t\n\t\t\t\n\t\t\t// let book = abbObjGNRL.book;\n\t\t\t// \tif (book) {book = book.replace(\" \", \"%20\");};\n\t\t\t// let chapterStart = abbObjGNRL.chapterStart;\n\t\t\t// let verseStart = abbObjGNRL.verseStart;\n\t\t\t// let verseEnd = abbObjGNRL.verseEnd;\n\t\t\t// let tbc = abbObjGNRL.tbc;\n\t\t\t// //+ \"%20\" + chapterStart + \"#W\" + verseStart\n\t\t\t// let versesMap = new Map();\n\t\t\t// let verses = null;\n\t\t\t// let siteHTML = $.get(\"http://biblia.deon.pl/otworz.php?skrot=\" + book + \"%20\" + chapterStart, function() {\n\t\t\t// \t//console.log(\"bum\", siteHTML.responseText);\n\t\t\t// \t//siteHTML = siteHTML.responseText;\n\t\t\t// \t//(/13&nbsp;\\<\\/span\\>.*\\<a name=\"W14/g)\n\t\t\t// \tlet toMatch = new RegExp(verseStart + '&nbsp;\\\\<\\\\/span\\\\>.*\\\\<a name=\"W' + verseEnd, 'g');\n\t\t\t// \tlet verses = siteHTML.responseText.match(toMatch);\n\t\t\t// \tconsole.log(verses);\n\t\t\t// console.log(siteHTML);\n\t\t\t// });\n\t\t\t// //let regexp = null;\n\t\t\t// return null\n\t\t\t},\n\n\t\t\taddQuotations :\n\t\t\tfunction(node, abbs) {\n\t\t    for (let key of abbs.keys()) {\n\t\t\t\tif (node.innerHTML) { //add a test to see if it's not a script or something else that we shouldn't mess up\n\t\t\t\t\tnode.innerHTML = replaceAll(node.innerHTML, key, makeLink(key, abbs.get(key)));\n\t\t\t\t\t//node.innerHTML = node.innerHTML.replace(key, makeLink(key, abbs.get(key)));\n\t\t\t\t\t//console.log(fetchVerse(key, abbs.get(key)));\n\t\t\t\t\tfetchVerse(key, abbs.get(key));\n\t\t\t\t}\n\t\t\t}\n\t\t    return null;\n\t\t\t}\n\t\t}\n\t\t\t\n\t}\n\n};\n",
-			"file": "lang/pl/general2.js",
-			"file_size": 7088,
-			"file_write_time": 131402188526931681,
+			"contents": "Package Control Messages\n========================\n\nBracketHighlighter\n------------------\n\n  # BracketHighlighter\n  \n  Welcome to BracketHighlighter!  For a quick start guide, please go to  \n  `Preferences->Package Settings->BracketHighlighter->Quick Start Guide`.\n",
 			"settings":
 			{
-				"buffer_size": 7084,
+				"buffer_size": 264,
+				"line_ending": "Unix",
+				"name": "Package Control Messages",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"file": "fuck/shurt.htm",
+			"settings":
+			{
+				"buffer_size": 2801,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "fuck/ghostery/panel.css",
+			"settings":
+			{
+				"buffer_size": 53951,
 				"encoding": "UTF-8",
 				"line_ending": "Unix",
-				"name": "pl = {"
+				"name": "@font-face{font-family:'Open Sans';font-style:norm"
 			}
 		},
 		{
-			"file": "background-page.html",
+			"file": "popup/button-popup.html",
 			"settings":
 			{
-				"buffer_size": 233,
+				"buffer_size": 543,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "other/short/short.htm",
+			"file": "popup/button-popup.css",
 			"settings":
 			{
-				"buffer_size": 2508,
+				"buffer_size": 706,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Witaj\n\nDziękujemy za skorzystanie z rejestracji ON-Line.\n\nMasz zarejestrowaną wizytę u dr Marta Daniłoś w dniu wtorek sierpień 22, 2017 17:30 na nr. Pesel 87080400335\n\n.\n\nW celu odowłania rezerwacji wpisz podany kod 68f30413b894d94841a00ba6d25efcb9 w polu Kod anulowania wizyty\n\npod adresem https://nzoz-familia.pl/index.php/rejestracja-online\n\nAnulowanie zarejestrowanej wizyty jest możliwe najpóźniejÂ  2Â  godzinyÂ  przed wizytą.\n\n.\nTb 4, 15a. 16a. 18a. 19a\nDziękujemy , miłego dnia.\n\n.\n\n<!--     //(Iz 61, 10 - 62, 5) \n    //Pwt 7, 6b. 8-9 \n    //por. 13, 11 -->\n\nMi4wMDQyfHwxNDg3MDk3MzQ4NzkzOzE0NDIxNjcyMzE5ODQ7MTUwMzIxMzU3MzcyNTtNZXRhbCBUdXJ0bGU7cXNjYXh8w6XCucKADnw3LjkyMzg5OTIxNDU0Nzc3MWUrMjg7MS4zNjc0MjEwODU2NDE3OTdlKzI5OzQyNTY7MTA5MTsyLjE5Mzc2ODk5MTczNTg5MzZlKzI3OzE3MzM1OzA7Mjs1LjE3NzYwMzg4NTcyMDczN2UrMjg7MzsxMjswOzA7LTE7MTE7MTAyOzMuNDUyMDc0MTcxODc0NDAxNWUrMjc7Mzg5OzE0OzE0Oy0xOzY7OzEuMzY4Mjg2NjUxMDk0MzE3NGUrMjU7ODszNzI3MTQ7MTk0MTk7MzUzMjk1OzA7MDsyMjY7MTg5OzMyMTstMTstMTsxMTsxOzA7MTszMzswOzA7MTsxOzE1MDMyMTM1MTc5ODU7fDQzNiw1MzYsNi4yNDkyOTE2NTYwNjI1OWUrMjYsMDszNDcsNDQ3LDEuMTk2NTkxODIzNzk5Mjc1NmUrMjUsMDszMTQsNDE0LDIuNzg3NTI4NDEwOTkwMTU2N2UrMjIsMDszMDAsNDAwLDEuNjkzNTkxMTU2MTMzMjU5NGUrMjQsMDsyODMsMzgzLDMuNjMxMTI1MDE1NTM3NTg3NmUrMjIsMDsyNTEsMzUxLDEuNjIwOTEwNjIyNDU5OTI5OWUrMjQsMDsyNTAsMjUwLDYuNzkyNjgwMzM0ODUzNjA5ZSsyMywwOzMwMCwzMDAsNi42MjQ2MTgyNTQxMTExMzNlKzI1LDA7MjkwLDI5MCwxLjQ1NjgyMjQ5NzQ4Nzk4ODZlKzI1LDA7MjUxLDI1MSw5LjMxODc2MjU3NTk3NTI5OGUrMjQsMDsyMTMsMjEzLDUuNjIxMzAzMzYzNzE3NzQyZSsyNSwwOzIwNywyMDcsMi43NTY3NDU1NjQzNzY0NDczZSsyNiwwOzIwOCwyMDksMS42OTE1MDE5OTczNTIzMTk3ZSsyNywwOzIwMiwyMDIsNS44NDc5MDU1MzU2MTQ3MjNlKzI3LDA7MCwwLDAsMDt8w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8Kvw6fCs8K8w6bCj8K/w6TCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8Kzw6fCv8K/w6fCvMKDw6fCsMK/w6TCs8K/w6fCv8K/w6fCv8K8w6fCv8K/w6fCv8K/w6bCqsKPw6fCv8K/w6fCv8K/w6fCv8Kyw6fCv8K/w6fCv8K8w6fCvsK/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCv8K/w6fCgMKAw6TCv8K8w6TCv8Kzw6TCvMK8w6fCv8K/w6fCv8K/w6fCv8K/w6fCgMKPw6bCvMK/w6TCjsKvw6fCj8K/w6fCv8K/w6fCv8K/w6fCg8Kvw6TCv8KMw6fCjMKzw6TCs8KMw6fCjMKzw6TCsMKAw6TCisKqw6bCoMKAw6TCoMKAw6TCgMKKw6bCqsKAw6bCgMKASHzDp8K/wr/Dp8K/wr/Dp8K/wr/Dp8K/wr/Dp8K/wr/DpcK/wp/DpsK/woDDpMK/wr/Dp8Kfwr/Dp8K/wr/Dp8K/wr/Dp8K9wrvDp8K/wr/Dp8K/wr/Dp8K/wrPDp8K/woHDp8KBwr/Dp8K3wovDp8KwwoLDpMKAwrDDpMKAwoHDp8K/woDDpMKAwoDDpMKAwoAFfA%3D%3D%21END%21  cookieclicker",
+			"settings":
+			{
+				"buffer_size": 2380,
+				"line_ending": "Unix",
+				"name": "Witaj"
 			}
 		}
 	],
@@ -143,21 +257,31 @@
 	"command_palette":
 	{
 		"height": 96.0,
-		"last_filter": "Package Control: install",
+		"last_filter": "install",
 		"selected_items":
 		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"javascript",
+				"Set Syntax: JavaScript"
+			],
 			[
 				"Package Control: install",
 				"Package Control: Install Package"
 			]
 		],
-		"width": 449.0
+		"width": 467.0
 	},
 	"console":
 	{
 		"height": 139.0,
 		"history":
 		[
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			" import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
 			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) "
 		]
 	},
@@ -173,11 +297,22 @@
 	"expanded_folders":
 	[
 		"/home/maciek/Documents/newprog/ecclus",
+		"/home/maciek/Documents/newprog/ecclus/fuck",
 		"/home/maciek/Documents/newprog/ecclus/lang",
 		"/home/maciek/Documents/newprog/ecclus/lang/pl"
 	],
 	"file_history":
 	[
+		"/home/maciek/Documents/newprog/ecclus/lang/pl/general.js",
+		"/home/maciek/Documents/newprog/ecclus/fuck/shurt.htm",
+		"/home/maciek/Documents/newprog/ecclus/fuck/shurt (copy).htm",
+		"/home/maciek/Documents/newprog/ecclus/fuck/ghostery/untitled.html",
+		"/home/maciek/Documents/newprog/ecclus/background-page.html",
+		"/home/maciek/Documents/newprog/ecclus/fuck/short.htm",
+		"/home/maciek/Documents/newprog/ecclus/other/short/short.htm",
+		"/home/maciek/Documents/korespondencja z księżmi xD.txt",
+		"/home/maciek/Documents/newprog/bible api mockup.json",
+		"/home/maciek/Documents/newprog/ecclus/lang/pl/general2.js",
 		"/home/maciek/Desktop/faryzeusze",
 		"/home/maciek/not",
 		"/home/maciek/Documents/newprog/ecclus/other/example/example.htm",
@@ -201,9 +336,10 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
@@ -211,6 +347,30 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"currChapInd",
+			"abbObjGNRL",
+			"console.log",
+			"currentChapterIndex",
+			"replace",
+			"extractIn",
+			"console.log",
+			";\n",
+			"replaceAll",
+			"fetchVerse",
+			"text",
+			");\n",
+			"addQuotations",
+			"console.log",
+			"lang",
+			"search",
+			"makeLink",
+			"escapeRegExp",
+			"extractVerse",
+			"extractVerse ",
+			"b",
+			"');",
+			"abbs",
+			"tbc",
 			"abbObjGNRL",
 			"makeLink",
 			"abbObj",
@@ -250,15 +410,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 559,
+						"buffer_size": 1080,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								237,
-								237
+								66,
+								66
 							]
 						],
 						"settings":
@@ -266,10 +426,10 @@
 							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 299.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -278,15 +438,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2410,
+						"buffer_size": 1582,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								985,
-								985
+								313,
+								313
 							]
 						],
 						"settings":
@@ -295,10 +455,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 102.0,
+						"translation.y": 459.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -307,15 +467,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2479,
+						"buffer_size": 1940,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1824,
-								1824
+								1634,
+								1634
 							]
 						],
 						"settings":
@@ -323,10 +483,10 @@
 							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 153.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -335,27 +495,24 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7084,
+						"buffer_size": 12261,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6024,
-								6024
+								4896,
+								4896
 							]
 						],
 						"settings":
 						{
-							"rulers":
-							[
-								120
-							],
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2142.0,
+						"translation.y": 4221.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -363,54 +520,28 @@
 				},
 				{
 					"buffer": 4,
-					"file": "lang/pl/general2.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7084,
+						"buffer_size": 264,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7084,
-								7084
+								264,
+								264
 							]
 						],
 						"settings":
 						{
-							"auto_name": "pl = {",
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "background-page.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 233,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								233,
-								233
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.sublime-syntax"
+							"auto_indent": false,
+							"bracket_highlighter.busy": false,
+							"default_dir": "/home/maciek/Documents/newprog/ecclus",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_width": 2,
+							"word_wrap": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -420,20 +551,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "other/short/short.htm",
+					"buffer": 5,
+					"file": "fuck/shurt.htm",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2508,
+						"buffer_size": 2801,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1886,
-								1886
+								2090,
+								2090
 							]
 						],
 						"settings":
@@ -441,10 +572,126 @@
 							"syntax": "Packages/HTML/HTML.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 204.0,
+						"translation.y": 323.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "fuck/ghostery/panel.css",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 53951,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6998,
+								6998
+							]
+						],
+						"settings":
+						{
+							"auto_name": "@font-face{font-family:'Open Sans';font-style:norm",
+							"syntax": "Packages/CSS/CSS.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3461.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "popup/button-popup.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 543,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								270,
+								270
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "popup/button-popup.css",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 706,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								155,
+								155
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2380,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								460,
+								460
+							]
+						],
+						"settings":
+						{
+							"auto_name": "Witaj",
+							"default_dir": "/home/maciek/Documents/newprog/ecclus",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
 					"type": "text"
 				}
 			]

@@ -1,78 +1,50 @@
-function waitForGrabVerse(response, someFunction){
-	if (typeof response !== "undefined"){
-		someFunction(response);
-	}
-	else {
-		setTimeout(waitForGrabVerse, 500);
-	}
-}
-
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		//console.log(request);
 		if (request) {
-			var response = grabVerseTwo(request);
+			var response = grabVerse(request);
 			response.then(sendResponse(response));
-
-	  	}
-	  	//return true;
+		}
 	});
 
-function grabVerseTwo(request) {
+function grabVerse(request) {
 	return new Promise(function(resolve, reject) {
 		let parsedRequest = JSON.parse(request);
-		//let url = 
-		let abbObj = parsedRequest.abbObjGNRL;
-		let book = abbObj.book;
+		//let abbObj = parsedRequest.abbObj;
+		let book = parsedRequest.abbObj.book;
 			if (book) {book = book.replace(" ", "%20");};
-		let chapterStart = abbObj.chapterStart;
-		let verseStart = abbObj.verseStart;
-			if (verseStart) {verseStart = verseStart.match(/\d+/g)[0];};
-		let verseEnd = abbObj.verseEnd;
-		let tbc = abbObj.tbc;
-		$.ajaxSetup({processData: false});
-		let url = "http://biblia.deon.pl/otworz.php?skrot=" + book + "%20" + chapterStart;
-		let site = $.get(url, function(data) {
-			//console.log(typeof data);
-			console.log(data);
-			resolve(encodeURIComponent(data));
-		});
-		//console.log(site);
+		// let chapterStart = abbObj.chapterStart;
+		// let verseStart = abbObj.verseStart;
+		// let verseEnd = abbObj.verseEnd;
+		// let letter = abbObj.letter;
+		let charset = parsedRequest.charset;
+		// let startMatchString = parsedRequest.startMatchString;
+		// let endMatchString = parsedRequest.endMatchString;
+		// let endOfTextString = parsedRequest.endOfTextString;
+		var urlsToGet = parsedRequest.urlsToGet;
+		var fetchedPages = [];
+		var promises = [];
+		$.ajaxSetup({
+	        processData: false,
+	        beforeSend: function(jqXHR) {
+	            jqXHR.overrideMimeType('text/html;charset=' + charset);
+        	}
+    	});
+    	//console.log(urlsToGet);
+    	for (i in urlsToGet){
+    		promises.push(new Promise(function(resolve, reject)
+    			{let myGet = $.get(urlsToGet[i], function(fetchedData){
+    				fetchedPages.push(fetchedData);
+    				//console.log(fetchedPages);
+    				myGet.then(function () {
+   						resolve(fetchedData);
+					});
+    				// myGet.then(resolve(fetchedData)); 
+    				//resolve(data);
+    			})
+    		}));
+    	Promise.all(promises).then(function () {
+   			resolve(fetchedPages);
+			});
+    	}
 	})
 }
-
-// function grabVerse(response, trigger, passedSiteHTML) {
-// 	let parsedResponse = JSON.parse(response);
-// 	let abbObjBS = parsedResponse.abbObjGNRL;
-// 	let book = abbObjBS.book;
-// 		if (book) {book = book.replace(" ", "%20");};
-// 	let chapterStart = abbObjBS.chapterStart;
-// 	let verseStart = abbObjBS.verseStart;
-// 		//console.log(verseStart);
-// 		if (verseStart) {verseStart = verseStart.match(/\d+/g)[0];};
-// 		// index zero because we're grabbing the typical case here TODO: make it work with other flavors
-// 	let verseEnd = abbObjBS.verseEnd;
-// 	let tbc = abbObjBS.tbc;
-// 	let versesMap = new Map();
-// 	let verses = null;
-// 	$.ajaxSetup({
-//   		processData: false
-// 		});
-// 	if (trigger == true) {
-// 		let theHTML = passedSiteHTML;
-// 		if (theHTML) {
-// 			toMatch = new RegExp(verseStart + '&nbsp;\\<\\/span\\>.*\\<a name="W' + verseEnd, 'g');
-// 			verses = theHTML.match(toMatch);
-// 			}
-// 		console.log(verses, trigger);
-// 		return verses;
-// 	}
-// 	else {
-// 	var dataOutside = null;
-// 	$.get("http://biblia.deon.pl/otworz.php?skrot=" + book + "%20" + chapterStart, function(data) {
-// 							//toReturn = grabVerse(response, true, data);
-// 							dataOutside = data;
-// 						});
-// 	return grabVerse(response, true, dataOutside);
-// 	};
-// }

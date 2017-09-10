@@ -1,11 +1,12 @@
+(function () {
 function getLanguage() {
 	// placeholder
-	return "pl";
+	return window.ecclus.worker;
 }
 
 function getTranslation() {
 	//placeholder
-	return "pl.translations.deon";
+	return window.ecclus.worker.translations.deon;
 }
 
 var searchForAbbreviations = null;
@@ -19,38 +20,20 @@ function detectAbbreviation(node) {
 			detectAbbreviation(node.childNodes[i]);
 			} 
 	    }
-	var text = node.textContent;
+	var text = node.innerHTML;
     if (text != undefined) {
-		var abbreviations = searchForAbbreviations(text);
+    	//console.log(text);
+    	//console.log(window.ecclus.searchForAbbreviations);
+		var abbreviations = window.ecclus.searchForAbbreviations(text);
+    	//console.log(abbreviations);
 		if (abbreviations) {
-			addQuotations(node, abbreviations);
+			window.ecclus.addQuotations(node, abbreviations);
 	    }
 	}
 }	
 
-// function addQuotations(node, abbs) {
-//     for (let key of abbs.keys()) {
-// 		if (node.innerHTML) { //add a test to see if it's not a script or something else that we shouldn't mess up
-// 			node.innerHTML = replaceAll(node.innerHTML, key, makeLink(key, abbs.get(key)));
-// 			//node.innerHTML = node.innerHTML.replace(key, makeLink(key, abbs.get(key)));
-// 		}
-// 	}
-//     return null
-// }
-// function addQuotations(node, abbs) {
-//     for (let key of abbs.keys()) {
-// 		if (node.innerHTML) { //add a test to see if it's not a script or something else that we shouldn't mess up
-// 			node.innerHTML = replaceAll(node.innerHTML, key, makeLink(key, abbs.get(key)));
-// 			//node.innerHTML = node.innerHTML.replace(key, makeLink(key, abbs.get(key)));
-// 			//console.log(fetchVerse(key, abbs.get(key)));
-// 			fetchVerse(key, abbs.get(key));
-// 		}
-// 	}
-//     return null;
-// }
-
 function escapeRegExp(str) {
-    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
 function replaceAll(str, find, replace) {
@@ -62,23 +45,23 @@ function getCharset() {
 	return $( 'meta[name="charset"]' );
 }
 
-// function waitForResponse(response, someFunction){
-//     if (typeof response !== "undefined") {
-//         someFunction(response);
-//     }
-//     else{
-//         setTimeout(waitForResponse, 250);
-//     }
-// }
+window.ecclus = window.ecclus || {};
+window.ecclus.escapeRegExp = escapeRegExp;
+window.ecclus.replaceAll = replaceAll;
 
 $(document).ready(function() {
-	var lang = eval(getLanguage());
-	var translation = eval(getTranslation());
-	searchForAbbreviations = lang.searchForAbbreviations;
+	var lang = getLanguage();
+	var translation = getTranslation();
+	//console.log(lang)
+	//console.log(translation)
+	window.ecclus.searchForAbbreviations = lang.searchForAbbreviations;
 	//addQuotations          = lang.addQuotations;
-	booksMap               = lang.booksMap;
-	makeLink               = translation.makeLink;
-	fetchVerse             = translation.fetchVerse;
-	addQuotations          = translation.addQuotations;
+	window.ecclus.booksMap               = lang.booksMap;
+	window.ecclus.extractIndividualNums  = lang.extractIndividualNums
+	window.ecclus.makeLink               = translation.makeLink;
+	window.ecclus.fetchVerse             = translation.fetchVerse;
+	window.ecclus.addQuotations          = translation.addQuotations;
+	window.ecclus.extractVerse           = translation.extractVerse;
 	detectAbbreviation(document.body);
 });
+})();
