@@ -23,7 +23,9 @@
 	},
 
 	"permissions": [
-	  "http://*.deon.pl/"],
+	  "http://*.deon.pl/",
+	  "storage",
+	  "tabs"],
 
 	"background": {
 	  "page": "background-page.html",
@@ -49,7 +51,7 @@
 	"content_scripts": [
 	{
 	  "matches": ["*://*.mateusz.pl/*", "file:///*", "*://*.brewiarz.pl/*"],
-	  "js": ["jquery-3.1.1.min.js", "detect.js", "lang/pl/general.js"]
+	  "js": ["jquery-3.1.1.min.js", "detect.js", "lang/pl/general.js", "lang/en/general.js"]
 	}
 	]
 }

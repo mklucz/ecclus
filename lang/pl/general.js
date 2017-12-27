@@ -1,5 +1,6 @@
 window.ecclus = window.ecclus || {};
-window.ecclus.worker = {
+//console.log("pl")
+window.ecclus.pl = {
 	booksMap : new Map([
 		['Rdz', 'Rdz'],
 		['Wj', 'Wj'],
@@ -370,35 +371,14 @@ window.ecclus.worker = {
 						}
 					}
 				}
-			
 
-				// let verseStart = abbObj.verseStart;
-				// if (abbObj.verseEnd != "") {
-				// 	var verseEnd = Number(abbObj.verseEnd) + 1;
-				// }
-				// else {
-				// 	var verseEnd = Number(abbObj.verseStart) + 1;
-				// }
-				//let startMatch = verseStart.toString() + "&nbsp;<\/span>";
-				//let startIndex = data.indexOf(startMatch);
-				//let endofTextIndex = data.indexOf('<div class="bottom-navi">');
-				//let endMatch = "<a name=\"W" + verseEnd.toString();
-				//console.log(data);
-				//let endIndex = data.search(endMatch);
-				// if (endIndex == -1 || endIndex > endofTextIndex){
-				// 	var endHere = endofTextIndex;
-				// }
-				// else {
-				// 	var endHere = endIndex;
-				// }
-				//let slice = data.slice(startIndex + startMatch.length, endHere);
 				slice = slice.replace(/(\<sup>.*?\<\/sup\>)/gi, "");
 				slice = slice.replace(/(\<div class=miedzy.*\<\/div\>)/gi, "");
 				slice = slice.replace(/(\<div class=rd.*\<\/div\>)/gi, "");
 				slice = slice.replace(/"/g, '&quot;');
 				slice = slice.replace(/<(?:.|\n)*?>/gm, "")
 				slice = slice.replace(/\s+$/, "")
-				console.log(slice);
+				//console.log(slice);
 				//slice = parseInt(startingVerse).toString() + " " + slice;
 				resolve(slice);
 				})

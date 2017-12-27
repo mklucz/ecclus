@@ -8,17 +8,35 @@
 <body>
   <div id="topbar">
     <div class="logo">
-    <img id="logo" src="/icons/48.png" alt="ecclus logo" style="width:48px;height:48px;align-self: center;"/>
+    <img id="logo" src="/icons/32.png" alt="ecclus logo"/>
     </div>
-    chujumuju
+    <span class="topbartitle">
+    ecclus 0.0.3
+    </span>
   </div>
   <div class="chooser">
     <button class="chooser-button">Język</button>
       <div class="dropdown-content">
-        <a href="#">Polski</a>
-        <a href="#">English</a>
-        <a href="#">Lorem Ipsum</a>
+        <a href="#" class="language pl">Polski</a>
+        <a href="#" class="language en">English</a>
+      </div>
   </div>
-
+  <div id="translation-choosers">
+    <div class="chooser pl trans-chooser" id="pl">
+      <button class="chooser-button">Tłumaczenie</button>
+        <div class="dropdown-content">
+          <a href="#" class="translation deon">Biblia Tysiąclecia - Deon.pl</a>
+          <a href="#" class="translation blank">blank</a>
+        </div>
+    </div>
+    <div class="chooser en trans-chooser" id="en">
+      <button class="chooser-button">Translation</button>
+        <div class="dropdown-content">
+          <a href="#" class="translation kjv-wikisource">King James Version - Wikisource</a>
+          <a href="#" class="translation blank">blank</a>
+        </div>
+    </div>
+  </div>
+<script src="popup-script.js"></script>
 </body>
 </html>
