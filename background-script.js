@@ -8,6 +8,7 @@ chrome.runtime.onMessage.addListener(
 
 function grabVerse(request) {
 	return new Promise(function(resolve, reject) {
+		// console.log(request)
 		let parsedRequest = JSON.parse(request);
 		//let abbObj = parsedRequest.abbObj;
 		let book = parsedRequest.abbObj.book;

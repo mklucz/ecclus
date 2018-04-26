@@ -15,35 +15,33 @@ var addQuotations = null;
 var makeLink = null;
 var fetchVerse = null;
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+var listener = chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.language) {
-		//console.log("jezyk ", request);
 		let settingLanguage = chrome.storage.local.set({language : request.language});
-		//settingLanguage.then(null, onError);
 	}
 	else if (request.translation) {
-		//console.log("tlumaczenie ", request);
 		let settingTranslation = chrome.storage.local.set({translation : request.translation});
-		//settingTranslation.then(null, onError);
 	}
 	else if (request.grabLanguage) {
 		console.log(request);
-		//sendResponse("lang trans")
 		if (detectedBrowser == "Firefox") {
 			let gettingLanguage = chrome.storage.local.get("language");
 			let gettingTranslation = chrome.storage.local.get("translation");
 			Promise.all([gettingLanguage, gettingTranslation]).then(values => {
 				sendResponse(values);
-				//sendResponse("nico")
-				//console.log(values);
 			});
 		}
 		else if (detectedBrowser == "Chrome") {
-			let gettingLanguage = chrome.storage.local.get("language", function(response) {
-				console.log(response);
+			chrome.storage.local.get("language", (language) => {
+				chrome.storage.local.get("translation", (translation) => {
+					console.log(language, translation)
+				})
+				
+				sendResponse("placeholder")
 			})
 		}
 	}
+	return true;
 });
 
 function setLanguage(l) {
