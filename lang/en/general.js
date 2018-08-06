@@ -96,8 +96,8 @@ window.ecclus.en = {
 	function(text) {
 
 	var candidates =
-	text.match(/((\d )*([a-zA-Z]+)(\.?)( )(\d{1,3})((:|.)(\d+)((-)*?(\d+))?)?)/g);
-	//https://regex101.com/r/3c2TVk/3
+	text.match(/(|\d )([A-Z][a-z]*\.? ?\d{1,3}((|–|-|:)?(\d{1,3})?))(|(|–|-|—|)?(, )?)?(\d{1,3})?/g);
+	// https://regex101.com/r/vphlJ7/4/
 
 	if (candidates == null) {return null};
 	var previousBook = null; //handles the semicolon in >>1 Kor 12, 3-5; 13, 1-2<< 
